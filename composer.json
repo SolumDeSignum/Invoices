@@ -3,21 +3,30 @@
     "description": "Generate PDF invoices for your customers in laravel",
     "type": "library",
     "keywords": [
-        "Laravel", "Invoices", "Generate", "Create",
-        "Open Source", "Customers", "PDF", "Erik Campobadal"
+        "Laravel",
+        "Invoices",
+        "Generate",
+        "Create",
+        "Open Source",
+        "Customers",
+        "PDF",
+        "Erik Campobadal"
     ],
     "require": {
         "ext-bcmath": "*",
-        "illuminate/support": "^5.0|^6.0|^7.0|^8.0",
-        "illuminate/view": "^5.0|^6.0|^7.0|^8.0",
-        "nesbot/carbon": ">1.22",
-        "dompdf/dompdf": "^1.0"
+        "laravel/framework": "~5|~6|~7|~8|~9",
+        "nesbot/carbon": "^1.3|^2.5",
+        "dompdf/dompdf": "^1.0|^1.1|^1.2"
     },
     "license": "MIT",
     "authors": [
         {
             "name": "Erik Campobadal",
             "email": "ConsoleTVs@gmail.com"
+        },
+        {
+            "name": "Oskars Germovs",
+            "email": "oskars_germovs@inbox.lv"
         }
     ],
     "autoload": {
