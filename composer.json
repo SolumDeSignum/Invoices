@@ -14,7 +14,7 @@
     ],
     "require": {
         "ext-bcmath": "*",
-        "laravel/framework": "^8|^9|^10",
+        "illuminate/support": "^9.0|^10.0",
         "nesbot/carbon": "^2.66.0",
         "dompdf/dompdf": "^2.0.3"
     },
