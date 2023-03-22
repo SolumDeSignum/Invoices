@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -24,7 +26,7 @@ return [
 
    'decimals' => 2,
 
-   
+
    /*
    |--------------------------------------------------------------------------
    | Default Invoice Logo
@@ -96,7 +98,7 @@ return [
         'tax_type'  => 'percentage',
     ],
   ],
-  
+
   /*
   | Default Invoice Due Date
   |--------------------------------------------------------------------------

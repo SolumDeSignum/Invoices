@@ -1,5 +1,5 @@
 {
-    "name": "consoletvs/invoices",
+    "name": "solumdesignum/invoices",
     "description": "Generate PDF invoices for your customers in laravel",
     "type": "library",
     "keywords": [
@@ -10,6 +10,7 @@
         "Open Source",
         "Customers",
         "PDF",
+        "Oskars Germovs",
         "Erik Campobadal"
     ],
     "require": {
@@ -21,23 +22,23 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Erik Campobadal",
-            "email": "ConsoleTVs@gmail.com"
-        },
-        {
             "name": "Oskars Germovs",
             "email": "oskars_germovs@inbox.lv"
+        },
+        {
+            "name": "Erik Campobadal",
+            "email": "ConsoleTVs@gmail.com"
         }
     ],
     "autoload": {
         "psr-4": {
-            "ConsoleTVs\\Invoices\\": "."
+            "SolumDeSignum\\Invoices\\": "."
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "ConsoleTVs\\Invoices\\InvoicesServiceProvider"
+                "SolumDeSignum\\Invoices\\InvoicesServiceProvider"
             ]
         }
     },

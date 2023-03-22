@@ -20,7 +20,7 @@ This is a sample invoice generated using this library:
 ![Sample Invoice](https://i.gyazo.com/768f5b59791162e432f9cdfa15f017bc.png)
 
 ```php
-$invoice = \ConsoleTVs\Invoices\Classes\Invoice::make()
+$invoice = \SolumDeSignum\Invoices\Classes\InvoiceService::make()
                 ->addItem('Test Item', 10.25, 2, 1412)
                 ->addItem('Test Item 2', 5, 2, 923)
                 ->addItem('Test Item 3', 15.55, 5, 42)

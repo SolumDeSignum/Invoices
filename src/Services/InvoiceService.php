@@ -1,26 +1,17 @@
 <?php
-/**
-  * This file is part of consoletvs/invoices.
-  *
-  * (c) Erik Campobadal <soc@erik.cat>
-  *
-  * For the full copyright and license information, please view the LICENSE
-  * file that was distributed with this source code.
-  */
 
-namespace ConsoleTVs\Invoices\Classes;
+declare(strict_types=1);
+
+namespace SolumDeSignum\Invoices\Classes;
 
 use Carbon\Carbon;
-use ConsoleTVs\Invoices\Traits\Setters;
 use Illuminate\Support\Collection;
-use Storage;
+use Illuminate\Support\Facades\Storage;
+use JsonException;
+use SolumDeSignum\Invoices\Traits\Setters;
+use stdClass;
 
-/**
- * This is the Invoice class.
- *
- * @author Erik Campobadal <soc@erik.cat>
- */
-class Invoice
+class InvoiceService
 {
     use Setters;
 
@@ -212,8 +203,8 @@ class Invoice
      * @method addItem
      *
      * @param string $name
-     * @param int    $price
-     * @param int    $amount
+     * @param int $price
+     * @param int $amount
      * @param string $id
      * @param string $imageUrl
      *
@@ -221,14 +212,16 @@ class Invoice
      */
     public function addItem($name, $price, $amount = 1, $id = '-', $imageUrl = null)
     {
-        $this->items->push(Collection::make([
-            'name'       => $name,
-            'price'      => $price,
-            'amount'    => $amount,
-            'totalPrice' => number_format(bcmul($price, $amount, $this->decimals), $this->decimals),
-            'id'         => $id,
-            'imageUrl'   => $imageUrl,
-        ]));
+        $this->items->push(
+            Collection::make([
+                'name' => $name,
+                'price' => $price,
+                'amount' => $amount,
+                'totalPrice' => number_format(bcmul($price, $amount, $this->decimals), $this->decimals),
+                'id' => $id,
+                'imageUrl' => $imageUrl,
+            ])
+        );
 
         return $this;
     }
@@ -253,10 +246,16 @@ class Invoice
      * @method formatCurrency
      *
      * @return stdClass
+     * @throws JsonException
      */
     public function formatCurrency()
     {
-        $currencies = json_decode(file_get_contents(__DIR__.'/../Currencies.json'));
+        $currencies = json_decode(
+            file_get_contents(__DIR__ . '/../../storage/currencies.json'),
+            false,
+            512,
+            JSON_THROW_ON_ERROR
+        );
         $currency = $this->currency;
 
         return $currencies->$currency;
@@ -319,20 +318,24 @@ class Invoice
      *
      * @return float
      */
-    private function taxPrice(Object $tax_rate = null)
+    private function taxPrice(object $tax_rate = null)
     {
         if (is_null($tax_rate)) {
             $tax_total = 0;
-            foreach($this->tax_rates as $taxe){
+            foreach ($this->tax_rates as $taxe) {
                 if ($taxe['tax_type'] == 'percentage') {
-                    $tax_total += bcdiv(bcmul($taxe['tax'], $this->subTotalPrice(), $this->decimals), 100, $this->decimals);
+                    $tax_total += bcdiv(
+                        bcmul($taxe['tax'], $this->subTotalPrice(), $this->decimals),
+                        100,
+                        $this->decimals
+                    );
                     continue;
                 }
                 $tax_total += $taxe['tax'];
             }
             return $tax_total;
         }
-        
+
         if ($tax_rate->tax_type == 'percentage') {
             return bcdiv(bcmul($tax_rate->tax, $this->subTotalPrice(), $this->decimals), 100, $this->decimals);
         }
@@ -361,7 +364,7 @@ class Invoice
      */
     private function generate()
     {
-        $this->pdf = PDF::generate($this, $this->template);
+        $this->pdf = PDFService::generate($this, $this->template);
 
         return $this;
     }
@@ -416,15 +419,15 @@ class Invoice
     /**
      * Return true/false if one item contains image.
      * Determine if we should display or not the image column on the invoice.
-     * 
+     *
      * @method shouldDisplayImageColumn
      *
      * @return boolean
      */
     public function shouldDisplayImageColumn()
     {
-        foreach($this->items as $item){
-            if($item['imageUrl'] != null){
+        foreach ($this->items as $item) {
+            if ($item['imageUrl'] != null) {
                 return true;
             }
         }

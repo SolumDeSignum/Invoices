@@ -1,23 +1,12 @@
 <?php
-/**
-  * This file is part of consoletvs/invoices.
-  *
-  * (c) Erik Campobadal <soc@erik.cat>
-  *
-  * For the full copyright and license information, please view the LICENSE
-  * file that was distributed with this source code.
-  */
 
-namespace ConsoleTVs\Invoices\Traits;
+declare(strict_types=1);
+
+namespace SolumDeSignum\Invoices\Traits;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
-/**
- * This is the Setters trait.
- *
- * @author Erik Campobadal <soc@erik.cat>
- */
 trait Setters
 {
     /**
@@ -29,7 +18,7 @@ trait Setters
      *
      * @return self
      */
-    public function name($name)
+    public function name($name): static
     {
         $this->name = $name;
 
@@ -226,5 +215,4 @@ trait Setters
     }
 
 
-    
 }

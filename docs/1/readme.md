@@ -8,7 +8,7 @@ composer require consoletvs/invoices
 Example Usage:
 
 ```php
-$invoice = \ConsoleTVs\Invoices\Classes\Invoice::make()
+$invoice = \ConsoleTVs\Invoices\Classes\InvoiceService::make()
                 ->addItem('Test Item', 10.25, 2, 1412)
                 ->addItem('Test Item 2', 5, 2, 923)
                 ->addItem('Test Item 3', 15.55, 5, 42)
