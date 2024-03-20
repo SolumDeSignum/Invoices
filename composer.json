@@ -14,9 +14,9 @@
     ],
     "require": {
         "ext-bcmath": "*",
-        "illuminate/support": "^9.0|^10.0",
+        "illuminate/support": "^10.0|^11.0",
         "nesbot/carbon": "^2.66.0",
-        "dompdf/dompdf": "^2.0.3"
+        "dompdf/dompdf": "^2.00"
     },
     "license": "MIT",
     "authors": [
