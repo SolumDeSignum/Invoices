@@ -14,10 +14,11 @@
         "Erik Campobadal"
     ],
     "require": {
+        "php": "^8.1|^8.2|^8.3|^8.4",
+        "illuminate/support": "^5|^6|^7|^8|^9|^10|^11|^12",
         "ext-bcmath": "*",
-        "illuminate/support": "^9.0|^10.0",
-        "nesbot/carbon": "^2.66.0",
-        "dompdf/dompdf": "^2.0.3"
+        "nesbot/carbon": "^2|^3",
+        "dompdf/dompdf": "^2|^3"
     },
     "license": "MIT",
     "authors": [
@@ -42,5 +43,15 @@
             ]
         }
     },
-    "minimum-stability": "dev"
+    "config": {
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "optimize-autoloader": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "phpunit --coverage-html coverage"
+    }
 }
