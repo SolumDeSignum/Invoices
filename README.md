@@ -30,9 +30,9 @@ $invoice = \SolumDeSignum\Invoices\Classes\InvoiceService::make()
                 ->addItem('Test Item 7', 2.86, 1, 1526)
                 ->addItem('Test Item 8', 5, 2, 923, 'https://dummyimage.com/64x64/000/fff')
                 ->number(4021)
-                ->with_pagination(true)
-                ->duplicate_header(true)
-                ->due_date(Carbon::now()->addMonths(1))
+                ->withPagination(true)
+                ->duplicateHeader(true)
+                ->dueDate(Carbon::now()->addMonths(1))
                 ->notes('Lrem ipsum dolor sit amet, consectetur adipiscing elit.')
                 ->customer([
                     'name'      => 'Èrik Campobadal Forés',

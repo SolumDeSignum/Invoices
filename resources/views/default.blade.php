@@ -10,14 +10,14 @@
                 box-sizing: border-box;
             }
 
-            h1,h2,h3,h4,h5,h6,p,span,div { 
-                font-family: DejaVu Sans; 
+            h1,h2,h3,h4,h5,h6,p,span,div {
+                font-family: DejaVu Sans;
                 font-size:10px;
                 font-weight: normal;
             }
 
-            th,td { 
-                font-family: DejaVu Sans; 
+            th,td {
+                font-family: DejaVu Sans;
                 font-size:10px;
             }
 
@@ -88,7 +88,7 @@
             <div style="margin-left:300pt;">
                 <b>Date: </b> {{ $invoice->date->formatLocalized('%A %d %B %Y') }}<br />
                 @if ($invoice->due_date)
-                    <b>Due date: </b>{{ $invoice->due_date->formatLocalized('%A %d %B %Y') }}<br />
+                    <b>Due date: </b>{{ $invoice->dueDate->formatLocalized('%A %d %B %Y') }}<br />
                 @endif
                 @if ($invoice->number)
                     <b>Invoice #: </b> {{ $invoice->number }}
@@ -104,13 +104,13 @@
                     <h4>Business Details:</h4>
                     <div class="panel panel-default">
                         <div class="panel-body">
-                            {!! $invoice->business_details->count() == 0 ? '<i>No business details</i><br />' : '' !!}
-                            {{ $invoice->business_details->get('name') }}<br />
-                            ID: {{ $invoice->business_details->get('id') }}<br />
-                            {{ $invoice->business_details->get('phone') }}<br />
-                            {{ $invoice->business_details->get('location') }}<br />
-                            {{ $invoice->business_details->get('zip') }} {{ $invoice->business_details->get('city') }}
-                            {{ $invoice->business_details->get('country') }}<br />
+                            {!! $invoice->businessDetails->count() == 0 ? '<i>No business details</i><br />' : '' !!}
+                            {{ $invoice->businessDetails->get('name') }}<br />
+                            ID: {{ $invoice->businessDetails->get('id') }}<br />
+                            {{ $invoice->businessDetails->get('phone') }}<br />
+                            {{ $invoice->businessDetails->get('location') }}<br />
+                            {{ $invoice->businessDetails->get('zip') }} {{ $invoice->businessDetails->get('city') }}
+                            {{ $invoice->businessDetails->get('country') }}<br />
                         </div>
                     </div>
                 </div>
@@ -118,13 +118,13 @@
                     <h4>Customer Details:</h4>
                     <div class="panel panel-default">
                         <div class="panel-body">
-                            {!! $invoice->customer_details->count() == 0 ? '<i>No customer details</i><br />' : '' !!}
-                            {{ $invoice->customer_details->get('name') }}<br />
-                            ID: {{ $invoice->customer_details->get('id') }}<br />
-                            {{ $invoice->customer_details->get('phone') }}<br />
-                            {{ $invoice->customer_details->get('location') }}<br />
-                            {{ $invoice->customer_details->get('zip') }} {{ $invoice->customer_details->get('city') }}
-                            {{ $invoice->customer_details->get('country') }}<br />
+                            {!! $invoice->customerDetails->count() == 0 ? '<i>No customer details</i><br />' : '' !!}
+                            {{ $invoice->customerDetails->get('name') }}<br />
+                            ID: {{ $invoice->customerDetails->get('id') }}<br />
+                            {{ $invoice->customerDetails->get('phone') }}<br />
+                            {{ $invoice->customerDetails->get('location') }}<br />
+                            {{ $invoice->customerDetails->get('zip') }} {{ $invoice->customerDetails->get('city') }}
+                            {{ $invoice->customerDetails->get('country') }}<br />
                         </div>
                     </div>
                 </div>
@@ -207,7 +207,7 @@
 
         <!-- Page count -->
         <script type="text/php">
-            if (isset($pdf) && $GLOBALS['with_pagination'] && $PAGE_COUNT > 1) {
+            if (isset($pdf) && $GLOBALS['withPagination'] && $PAGE_COUNT > 1) {
                 $pageText = "{PAGE_NUM} of {PAGE_COUNT}";
                 $pdf->page_text(($pdf->get_width()/2) - (strlen($pageText) / 2), $pdf->get_height()-20, $pageText, $fontMetrics->get_font("DejaVu Sans, Arial, Helvetica, sans-serif", "normal"), 7, array(0,0,0));
             }
