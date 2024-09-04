@@ -91,7 +91,7 @@ class InvoiceFeatureTest extends TestCase
         // Mocking file_get_contents and json_decode
         $this->mockFileReadAndJsonDecode($mockCurrencyData);
 
-        $invoice = new InvoiceService('USD');
+        $invoice = new Invoice('USD');
         $currency = $invoice->formatCurrency();
 
         $this->assertEquals('$', $currency->symbol);
