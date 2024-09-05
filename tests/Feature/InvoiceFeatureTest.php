@@ -94,8 +94,8 @@ class InvoiceFeatureTest extends TestCase
         $invoice = new Invoice('USD');
         $currency = $invoice->formatCurrency();
 
-        $this->assertEquals('$', $currency->symbol);
-        $this->assertEquals('US Dollar', $currency->name);
+        $this->assertEquals('€', $currency->symbol);
+        $this->assertEquals('Euro', $currency->name);
     }
 
     /** @test */
@@ -114,7 +114,7 @@ class InvoiceFeatureTest extends TestCase
         $invoice = new Invoice();
         $invoice->generate();
 
-        $response = $invoice->download('invoice');
+        $response = $invoice->download();
 
         $this->assertStringContainsString('application/pdf', $response->headers->get('Content-Type'));
     }

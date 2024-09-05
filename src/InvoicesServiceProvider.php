@@ -15,7 +15,10 @@ class InvoicesServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/resources/views', 'invoices');
+        $this->loadViewsFrom(
+            __DIR__ . '/../resources/views',
+            'solumdesignum/invoices'
+        );
 
         // Publishing is only necessary when using the CLI.
         if ($this->app->runningInConsole()) {

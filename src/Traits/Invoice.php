@@ -9,7 +9,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\View;
+use stdClass;
 
 trait Invoice
 {
@@ -43,7 +43,11 @@ trait Invoice
         $this->businessDetails = $businessDetails ?: (array)config('invoices.business_details');
         $this->footnote = $footnote ?: config('invoices.footnote');
         $this->taxRates = $taxRates ?: (array)config('invoices.tax_rates');
-        $this->dueDate = $dueDate ?: (config('invoices.due_date') ? Carbon::parse(config('invoices.due_date')) : null);
+        $this->dueDate = $dueDate ?: (config('invoices.due_date')
+            ? Carbon::parse(config('invoices.due_date'))
+            : Carbon::parse($dueDate)
+        );
+
         $this->withPagination = $withPagination ?: (bool)config('invoices.with_pagination');
         $this->duplicateHeader = $duplicateHeader ?: (bool)config('invoices.duplicate_header');
     }
@@ -89,6 +93,9 @@ trait Invoice
         return $this;
     }
 
+    /**
+     * @throws \JsonException
+     */
     public function formatCurrency(): stdClass
     {
         $currencies = json_decode(
@@ -97,9 +104,8 @@ trait Invoice
             512,
             JSON_THROW_ON_ERROR
         );
-        $currency = $this->currency;
 
-        return $currencies->$currency;
+        return $currencies->{$this->currency};
     }
 
     public function subTotalPrice(): float
@@ -185,9 +191,13 @@ trait Invoice
             ],
         ]);
 
+
+//        view("solumdesignum/invoices::$template");
+//        dd(View::make("solumdesignum/invoices::$template"));
+
         $pdf->setHttpContext($context);
 
-        $pdf->loadHtml(View::make('invoices::' . $template, [
+        $pdf->loadHtml(view("solumdesignum/invoices::$template", [
             'invoice' => $this,
             'with_pagination' => $this->withPagination
         ]));
@@ -199,11 +209,10 @@ trait Invoice
         return $this;
     }
 
-    public function download(string $name = 'invoice'): mixed
+    public function download(string $name = 'invoice'): void
     {
         $this->generate();
-
-        return $this->pdf->stream($name);
+        $this->pdf->stream($name);
     }
 
     public function save(string $name = 'invoice.pdf'): void
@@ -212,11 +221,10 @@ trait Invoice
         Storage::put($name, $invoice->pdf->output());
     }
 
-    public function show(string $name = 'invoice'): mixed
+    public function show(string $name = 'invoice'): void
     {
         $this->generate();
-
-        return $this->pdf->stream($name, ['Attachment' => false]);
+        $this->pdf->stream($name, ['Attachment' => false]);
     }
 
     public function shouldDisplayImageColumn(): bool
