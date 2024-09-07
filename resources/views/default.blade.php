@@ -150,11 +150,13 @@
         @foreach ($invoice->items as $item)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                @if($invoice->hasImage())
-                    <td>
-                        <img src="{{ url($item->get('imageUrl')) }}"/>
-                    </td>
-                @endif
+                <td>
+                    @if($invoice->hasImage() && $item->get('imageUrl'))
+                        <img src="{{ url($item?->get('imageUrl')) }}"/>
+                    @else
+                        -
+                    @endif
+                </td>
                 <td>{{ $item->get('id') }}</td>
                 <td>{{ $item->get('name') }}</td>
                 <td>{{ $item->get('price') }} {{ $invoice->formatCurrency()->symbol }}</td>
