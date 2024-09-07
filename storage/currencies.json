@@ -1060,5 +1060,50 @@
         "rounding": 0,
         "code": "ZMK",
         "name_plural": "Zambian kwachas"
+    },
+    "SSP": {
+        "symbol": "SS\u00a3",
+        "name": "South Sudanese Pound",
+        "symbol_native": "SS\u00a3",
+        "decimal_digits": 2,
+        "rounding": 0,
+        "code": "SSP",
+        "name_plural": "South Sudanese pounds"
+    },
+    "BTC": {
+        "symbol": "₿",
+        "name": "Bitcoin",
+        "symbol_native": "\u20bf",
+        "decimal_digits": 8,
+        "rounding": 0,
+        "code": "BTC",
+        "name_plural": "Bitcoins"
+    },
+    "SLS": {
+        "symbol": "SLS",
+        "name": "Somaliland Shilling",
+        "symbol_native": "SLS",
+        "decimal_digits": 0,
+        "rounding": 0,
+        "code": "SLS",
+        "name_plural": "Somaliland shillings"
+    },
+    "TMT": {
+        "symbol": "TMT",
+        "name": "Turkmenistani Manat",
+        "symbol_native": "TMT",
+        "decimal_digits": 2,
+        "rounding": 0,
+        "code": "TMT",
+        "name_plural": "Turkmenistani manats"
+    },
+    "KGS": {
+        "symbol": "KGS",
+        "name": "Kyrgyzstani Som",
+        "symbol_native": "\u0441\u043e\u043c",
+        "decimal_digits": 2,
+        "rounding": 0,
+        "code": "KGS",
+        "name_plural": "Kyrgyzstani som"
     }
 }

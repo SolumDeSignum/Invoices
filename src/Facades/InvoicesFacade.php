@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace SolumDeSignum\Invoices\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use SolumDeSignum\Invoices\Invoices;
 
-class Invoices extends Facade
+class InvoicesFacade extends Facade
 {
     /**
      * Get the registered name of the component.
@@ -15,6 +16,6 @@ class Invoices extends Facade
      */
     protected static function getFacadeAccessor(): string
     {
-        return 'invoices';
+        return Invoices::class;
     }
 }

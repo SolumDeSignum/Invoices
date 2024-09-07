@@ -7,15 +7,16 @@ namespace SolumDeSignum\Invoices\Traits;
 use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use InvalidArgumentException;
 use JsonException;
+use RuntimeException;
 use stdClass;
 
-trait Invoice
+trait InvoiceTrait
 {
-    use Setters;
-
     public function __construct(
         public readonly string $name = 'Invoice',
         public string $template = 'default',
@@ -45,17 +46,10 @@ trait Invoice
         $this->footnote = $footnote ?: config('invoices.footnote');
         $this->taxRates = $taxRates ?: (array)config('invoices.tax_rates');
         $this->dueDate = $dueDate ?: (config('invoices.due_date')
-            ? Carbon::parse(config('invoices.due_date'))
-            : Carbon::parse($dueDate)
+            ? Carbon::parse(config('invoices.due_date')) : Carbon::parse($dueDate)
         );
-
         $this->withPagination = $withPagination ?: (bool)config('invoices.with_pagination');
         $this->duplicateHeader = $duplicateHeader ?: (bool)config('invoices.duplicate_header');
-    }
-
-    public static function make(string $name = 'Invoice'): self
-    {
-        return new self($name);
     }
 
     public function template(string $template = 'default'): self
@@ -137,31 +131,34 @@ trait Invoice
 
     public function taxPrice(?object $taxRate = null): float
     {
+        $taxTotal = '0.0';
+
         if (is_null($taxRate)) {
-            $taxTotal = 0.0;
             foreach ($this->taxRates as $tax) {
                 if ($tax['tax_type'] === 'percentage') {
-                    $taxTotal += bcdiv(
+                    $percentageTax = bcdiv(
                         bcmul((string)$tax['tax'], (string)$this->subTotalPrice(), $this->decimals),
                         '100',
                         $this->decimals
                     );
+                    $taxTotal = bcadd($taxTotal, $percentageTax, $this->decimals);
                 } else {
-                    $taxTotal += (float)$tax['tax'];
+                    $taxTotal = bcadd($taxTotal, (string)$tax['tax'], $this->decimals);
                 }
             }
-            return $taxTotal;
+        } else {
+            if ($taxRate->tax_type === 'percentage') {
+                $taxTotal = bcdiv(
+                    bcmul((string)$taxRate->tax, (string)$this->subTotalPrice(), $this->decimals),
+                    '100',
+                    $this->decimals
+                );
+            } else {
+                $taxTotal = (string)$taxRate->tax;
+            }
         }
 
-        if ($taxRate->tax_type === 'percentage') {
-            return (float)bcdiv(
-                bcmul((string)$taxRate->tax, (string)$this->subTotalPrice(), $this->decimals),
-                '100',
-                $this->decimals
-            );
-        }
-
-        return (float)$taxRate->tax;
+        return (float)$taxTotal;
     }
 
     public function taxPriceFormatted(?object $taxRate): string
@@ -175,7 +172,7 @@ trait Invoice
         $availableTemplates = config('invoices.templates');
 
         if (!in_array($template, $availableTemplates, true)) {
-            throw new \InvalidArgumentException('Invalid template specified.');
+            throw new InvalidArgumentException('Invalid template specified.');
         }
 
         $options = new Options();
@@ -202,8 +199,8 @@ trait Invoice
 
         try {
             $pdf->render();
-        } catch (\Exception $e) {
-            throw new \RuntimeException('Failed to generate PDF: ' . $e->getMessage());
+        } catch (Exception $e) {
+            throw new RuntimeException('Failed to generate PDF: ' . $e->getMessage());
         }
 
         $this->pdf = $pdf;

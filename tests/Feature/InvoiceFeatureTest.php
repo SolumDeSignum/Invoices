@@ -9,7 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use JsonException;
-use SolumDeSignum\Invoices\Invoice;
+use SolumDeSignum\Invoices\Invoices;
 use SolumDeSignum\Invoices\InvoicesServiceProvider;
 use Tests\TestCase;
 
@@ -18,7 +18,7 @@ class InvoiceFeatureTest extends TestCase
     /** @test */
     public function itCreatesAnInvoiceWithDefaultValues()
     {
-        $invoice = new Invoice();
+        $invoice = new Invoices();
 
         $this->assertEquals('Invoice', $invoice->name);
         $this->assertEquals('default', $invoice->template);
@@ -42,7 +42,7 @@ class InvoiceFeatureTest extends TestCase
     /** @test */
     public function itAddsAnItemToTheInvoice()
     {
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->addItem('Item 1', 100.00, 2, '001', 'http://example.com/image.jpg');
         $items = $invoice->items;
 
@@ -58,7 +58,7 @@ class InvoiceFeatureTest extends TestCase
     /** @test */
     public function itCalculatesSubtotalPrice()
     {
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->addItem('Item 1', 100.00, 2);
         $invoice->addItem('Item 2', 50.00, 1);
 
@@ -68,14 +68,14 @@ class InvoiceFeatureTest extends TestCase
     /** @test */
     public function itCalculatesTotalPriceWithTax()
     {
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->addItem('Item 1', 100.00, 2);
         $invoice->addItem('Item 2', 50.00, 1);
         $invoice->taxRates = [
             [
                 'tax_type' => 'percentage',
                 'tax' => 10
-            ]  // 10% tax
+            ]
         ];
 
         $this->assertEquals('275.00', $invoice->totalPriceFormatted());
@@ -86,19 +86,7 @@ class InvoiceFeatureTest extends TestCase
      */
     public function itFormatsCurrency()
     {
-        $mockCurrencyData = (object)[
-            'USD' => (object)['symbol' => '$', 'name' => 'US Dollar']
-        ];
-
-        $this->mock('file_get_contents', function () use ($mockCurrencyData) {
-            return json_encode($mockCurrencyData);
-        });
-
-        $this->mock('json_decode', function ($json) use ($mockCurrencyData) {
-            return $mockCurrencyData;
-        });
-
-        $invoice = new Invoice('USD');
+        $invoice = new Invoices();
         $currency = $invoice->formatCurrency();
 
         $this->assertEquals('€', $currency->symbol);
@@ -110,7 +98,7 @@ class InvoiceFeatureTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->template = 'invalid_template';
         $invoice->generate();
     }
@@ -118,7 +106,7 @@ class InvoiceFeatureTest extends TestCase
     /** @test */
     public function pdfGeneration()
     {
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->addItem('Item 1', 100.00, 2, '001', 'http://example.com/image.jpg');
         $generatedPdf = $invoice->generate()->pdf;
 
@@ -132,7 +120,7 @@ class InvoiceFeatureTest extends TestCase
     {
         Storage::fake('local');
 
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->addItem('Item 1', 100.00, 2, '001', 'http://example.com/image.jpg');
         $invoice->save('invoice.pdf');
 
@@ -143,7 +131,7 @@ class InvoiceFeatureTest extends TestCase
     /** @test */
     public function itChecksIfImageColumnShouldDisplay()
     {
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->addItem('Item 1', 100.00, 2, null, 'http://example.com/image.jpg');
         $item = $invoice->items->first();
 
@@ -153,7 +141,7 @@ class InvoiceFeatureTest extends TestCase
     /** @test */
     public function itChecksIfImageColumnIsEmpty()
     {
-        $invoice = new Invoice();
+        $invoice = new Invoices();
         $invoice->addItem('Item 1', 100.00, 2, null);
         $item = $invoice->items->first();
 

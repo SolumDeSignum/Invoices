@@ -20,7 +20,7 @@ This is a sample invoice generated using this library:
 ![Sample Invoice](https://i.gyazo.com/768f5b59791162e432f9cdfa15f017bc.png)
 
 ```php
-$invoice = \SolumDeSignum\Invoices\Classes\InvoiceService::make()
+$invoice = (new \SolumDeSignum\Invoices\Invoices())
                 ->addItem('Test Item', 10.25, 2, 1412)
                 ->addItem('Test Item 2', 5, 2, 923)
                 ->addItem('Test Item 3', 15.55, 5, 42)
@@ -29,12 +29,12 @@ $invoice = \SolumDeSignum\Invoices\Classes\InvoiceService::make()
                 ->addItem('Test Item 6', 6.41, 3, 452)
                 ->addItem('Test Item 7', 2.86, 1, 1526)
                 ->addItem('Test Item 8', 5, 2, 923, 'https://dummyimage.com/64x64/000/fff')
-                ->number(4021)
-                ->withPagination(true)
-                ->duplicateHeader(true)
-                ->dueDate(Carbon::now()->addMonths(1))
-                ->notes('Lrem ipsum dolor sit amet, consectetur adipiscing elit.')
-                ->customer([
+                ->setNumber(4021)
+                ->setWithPagination(true)
+                ->setDuplicateHeader(true)
+                ->setDueDate(Carbon::now()->addMonths(1))
+                ->setNotes('Lrem ipsum dolor sit amet, consectetur adipiscing elit.')
+                ->setCustomerDetails([
                     'name'      => 'Èrik Campobadal Forés',
                     'id'        => '12345678A',
                     'phone'     => '+34 123 456 789',
@@ -48,18 +48,12 @@ $invoice = \SolumDeSignum\Invoices\Classes\InvoiceService::make()
                 ->save('public/myinvoicename.pdf');
 ```
 
-## Documentation
-
-<p align="center">
-<a href="https://erik.cat/projects/invoices"><img src="http://i.imgur.com/47WnADd.png"></a>
-</p>
-
 ## License
 
 ```
 MIT License
 
-Copyright (c) 2017 Erik Campobadal
+Copyright (c) 2014 Oskars Germovs
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -82,5 +76,5 @@ SOFTWARE.
 ```
 
 ## Special thanks
-
+* [ConsoleTVs](https://github.com/ConsoleTVs);
 * [Codevio](https://github.com/codevio);

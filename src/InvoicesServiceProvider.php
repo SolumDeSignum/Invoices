@@ -42,7 +42,7 @@ class InvoicesServiceProvider extends ServiceProvider
         $this->app->singleton(
             'package-translator-loader',
             function ($app) {
-                return new Invoice($app);
+                return new Invoices($app);
             }
         );
     }
