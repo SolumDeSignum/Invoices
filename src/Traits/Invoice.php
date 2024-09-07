@@ -9,6 +9,7 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use JsonException;
 use stdClass;
 
 trait Invoice
@@ -71,7 +72,7 @@ trait Invoice
         ?string $id = '-',
         ?string $imageUrl = null
     ): self {
-        $this->items->push([
+        $this->items->push(new Collection([
             'name' => $name,
             'price' => $price,
             'amount' => $amount,
@@ -81,7 +82,7 @@ trait Invoice
             ),
             'id' => $id,
             'imageUrl' => $imageUrl,
-        ]);
+        ]));
 
         return $this;
     }
@@ -94,7 +95,7 @@ trait Invoice
     }
 
     /**
-     * @throws \JsonException
+     * @throws JsonException
      */
     public function formatCurrency(): stdClass
     {
@@ -178,41 +179,42 @@ trait Invoice
         }
 
         $options = new Options();
-        $options->set('isRemoteEnabled', false); // Set to false unless remote content is required
-        $options->set('isPhpEnabled', false);   // Set to false to avoid PHP execution in templates
+        $options->set('isRemoteEnabled', false); // Disable unless remote content is needed
+        $options->set('isPhpEnabled', false);   // Disable PHP execution in templates for security
 
         $pdf = new Dompdf($options);
-
         $context = stream_context_create([
             'ssl' => [
                 'verify_peer' => true,
                 'verify_peer_name' => true,
-                'allow_self_signed' => false,
+                'allow_self_signed' => false, // Ensure no self-signed certificates
             ],
         ]);
-
-
-//        view("solumdesignum/invoices::$template");
-//        dd(View::make("solumdesignum/invoices::$template"));
-
         $pdf->setHttpContext($context);
 
-        $pdf->loadHtml(view("solumdesignum/invoices::$template", [
+        $htmlContent = view("solumdesignum/invoices::$template", [
             'invoice' => $this,
             'with_pagination' => $this->withPagination
-        ]));
+        ])
+            ->render();
 
-        $pdf->render();
+        $pdf->loadHtml($htmlContent);
+
+        try {
+            $pdf->render();
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Failed to generate PDF: ' . $e->getMessage());
+        }
 
         $this->pdf = $pdf;
 
         return $this;
     }
 
-    public function download(string $name = 'invoice'): void
+    public function download(string $name = 'invoice'): mixed
     {
         $this->generate();
-        $this->pdf->stream($name);
+        return $this->pdf->stream($name);
     }
 
     public function save(string $name = 'invoice.pdf'): void
@@ -227,7 +229,7 @@ trait Invoice
         $this->pdf->stream($name, ['Attachment' => false]);
     }
 
-    public function shouldDisplayImageColumn(): bool
+    public function hasImage(): bool
     {
         foreach ($this->items as $item) {
             if (!is_null($item['imageUrl'])) {

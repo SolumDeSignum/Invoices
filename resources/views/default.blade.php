@@ -45,7 +45,6 @@
             border-spacing: 0;
             border-collapse: collapse;
             background-color: transparent;
-
         }
 
         thead {
@@ -91,7 +90,7 @@
     <div style="margin-left:300pt;">
         <b>Date: </b> {{ $invoice?->date?->isoFormat('dddd Do MMMM YYYY') }}<br/>
         @if ($invoice?->dueDate)
-            <b>Due date: </b>{{ $invoice?->dueDate?->isoFormat('dddd Do MMMM YYYY) }}<br/>
+            <b>Due date: </b>{{ $invoice?->dueDate?->isoFormat('dddd Do MMMM YYYY') }}<br/>
         @endif
         @if ($invoice->number)
             <b>Invoice #: </b> {{ $invoice->number }}
@@ -137,7 +136,7 @@
         <thead>
         <tr>
             <th>#</th>
-            @if($invoice->shouldDisplayImageColumn())
+            @if($invoice->hasImage())
                 <th>Image</th>
             @endif
             <th>ID</th>
@@ -151,10 +150,10 @@
         @foreach ($invoice->items as $item)
             <tr>
                 <td>{{ $loop->iteration }}</td>
-                @if($invoice->shouldDisplayImageColumn())
-                    <td>@if(!is_null($item->get('imageUrl')))
-                            <img src="{{ url($item->get('imageUrl')) }}"/>
-                        @endif</td>
+                @if($invoice->hasImage())
+                    <td>
+                        <img src="{{ url($item->get('imageUrl')) }}"/>
+                    </td>
                 @endif
                 <td>{{ $item->get('id') }}</td>
                 <td>{{ $item->get('name') }}</td>

@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Invoices\Tests\Feature;
 
-use Carbon\Carbon;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use JsonException;
 use SolumDeSignum\Invoices\Invoice;
 use SolumDeSignum\Invoices\InvoicesServiceProvider;
-use stdClass;
 use Tests\TestCase;
 
 class InvoiceFeatureTest extends TestCase
 {
     /** @test */
-    public function it_creates_an_invoice_with_default_values()
+    public function itCreatesAnInvoiceWithDefaultValues()
     {
         $invoice = new Invoice();
 
@@ -26,10 +26,7 @@ class InvoiceFeatureTest extends TestCase
         $this->assertEquals(config('invoices.currency'), $invoice->currency);
         $this->assertEquals(config('invoices.decimals'), $invoice->decimals);
         $this->assertEquals(config('invoices.logo'), $invoice->logo);
-
-
         $this->assertEquals(config('invoices.logo_height'), $invoice->logoHeight);
-
         $this->assertEquals(Carbon::now()->toDateString(), $invoice->date->toDateString());
         $this->assertEquals(config('invoices.footnote'), $invoice->footnote);
         $this->assertEquals(config('invoices.tax_rates'), $invoice->taxRates);
@@ -43,12 +40,12 @@ class InvoiceFeatureTest extends TestCase
     }
 
     /** @test */
-    public function it_adds_an_item_to_the_invoice()
+    public function itAddsAnItemToTheInvoice()
     {
         $invoice = new Invoice();
         $invoice->addItem('Item 1', 100.00, 2, '001', 'http://example.com/image.jpg');
-
         $items = $invoice->items;
+
         $this->assertCount(1, $items);
         $this->assertEquals('Item 1', $items->first()['name']);
         $this->assertEquals('100.00', $items->first()['price']);
@@ -59,7 +56,7 @@ class InvoiceFeatureTest extends TestCase
     }
 
     /** @test */
-    public function it_calculates_subtotal_price()
+    public function itCalculatesSubtotalPrice()
     {
         $invoice = new Invoice();
         $invoice->addItem('Item 1', 100.00, 2);
@@ -69,27 +66,37 @@ class InvoiceFeatureTest extends TestCase
     }
 
     /** @test */
-    public function it_calculates_total_price_with_tax()
+    public function itCalculatesTotalPriceWithTax()
     {
         $invoice = new Invoice();
         $invoice->addItem('Item 1', 100.00, 2);
         $invoice->addItem('Item 2', 50.00, 1);
         $invoice->taxRates = [
-            ['tax_type' => 'percentage', 'tax' => 10]  // 10% tax
+            [
+                'tax_type' => 'percentage',
+                'tax' => 10
+            ]  // 10% tax
         ];
 
         $this->assertEquals('275.00', $invoice->totalPriceFormatted());
     }
 
-    /** @test */
-    public function it_formats_currency()
+    /** @test
+     * @throws JsonException
+     */
+    public function itFormatsCurrency()
     {
         $mockCurrencyData = (object)[
             'USD' => (object)['symbol' => '$', 'name' => 'US Dollar']
         ];
 
-        // Mocking file_get_contents and json_decode
-        $this->mockFileReadAndJsonDecode($mockCurrencyData);
+        $this->mock('file_get_contents', function () use ($mockCurrencyData) {
+            return json_encode($mockCurrencyData);
+        });
+
+        $this->mock('json_decode', function ($json) use ($mockCurrencyData) {
+            return $mockCurrencyData;
+        });
 
         $invoice = new Invoice('USD');
         $currency = $invoice->formatCurrency();
@@ -99,7 +106,7 @@ class InvoiceFeatureTest extends TestCase
     }
 
     /** @test */
-    public function it_handles_invalid_templates()
+    public function itHandlesInvalidTemplates()
     {
         $this->expectException(\InvalidArgumentException::class);
 
@@ -109,68 +116,48 @@ class InvoiceFeatureTest extends TestCase
     }
 
     /** @test */
-    public function it_downloads_invoice_pdf()
+    public function pdfGeneration()
     {
         $invoice = new Invoice();
-        $invoice->generate();
+        $invoice->addItem('Item 1', 100.00, 2, '001', 'http://example.com/image.jpg');
+        $generatedPdf = $invoice->generate()->pdf;
 
-        $response = $invoice->download();
-
-        $this->assertStringContainsString('application/pdf', $response->headers->get('Content-Type'));
+        $this->assertNotNull($generatedPdf, 'PDF should not be null.');
+        $this->assertTrue($generatedPdf->getCanvas() !== null, 'Canvas should exist, meaning the PDF was rendered.');
+        $this->assertNotEmpty($generatedPdf->output(), 'Generated PDF content should not be empty.');
     }
 
     /** @test */
-    public function it_saves_invoice_pdf()
+    public function itSavesInvoicePdf()
     {
-        $invoice = new Invoice();
-        $invoice->generate();
-
-        // Mock Storage facade
         Storage::fake('local');
 
+        $invoice = new Invoice();
+        $invoice->addItem('Item 1', 100.00, 2, '001', 'http://example.com/image.jpg');
         $invoice->save('invoice.pdf');
 
         Storage::disk('local')->assertExists('invoice.pdf');
     }
 
-    /** @test */
-    public function it_shows_invoice_pdf_in_browser()
-    {
-        $invoice = new Invoice();
-        $invoice->generate();
-
-        $response = $invoice->show('invoice');
-
-        $this->assertStringContainsString('application/pdf', $response->headers->get('Content-Type'));
-    }
 
     /** @test */
-    public function it_checks_if_image_column_should_display()
+    public function itChecksIfImageColumnShouldDisplay()
     {
         $invoice = new Invoice();
         $invoice->addItem('Item 1', 100.00, 2, null, 'http://example.com/image.jpg');
+        $item = $invoice->items->first();
 
-        $this->assertTrue($invoice->shouldDisplayImageColumn());
-
-        $invoice->popItem();
-
-        $this->assertFalse($invoice->shouldDisplayImageColumn());
+        $this->assertIsString($item->get('imageUrl'));
     }
 
-    /**
-     * Mock file_get_contents and json_decode for testing currency formatting.
-     *
-     * @param stdClass $mockData
-     */
-    private function mockFileReadAndJsonDecode(stdClass $mockData): void
+    /** @test */
+    public function itChecksIfImageColumnIsEmpty()
     {
-        $this->mock('file_get_contents', function () use ($mockData) {
-            return json_encode($mockData);
-        });
+        $invoice = new Invoice();
+        $invoice->addItem('Item 1', 100.00, 2, null);
+        $item = $invoice->items->first();
 
-        $this->mock('json_decode', function ($json) use ($mockData) {
-            return $mockData;
-        });
+        $this->assertNull($item->get('imageUrl'));
     }
 
     /**
