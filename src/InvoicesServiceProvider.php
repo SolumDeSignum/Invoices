@@ -65,6 +65,9 @@ class InvoicesServiceProvider extends ServiceProvider implements DeferrableProvi
         $this->publishes([
             __DIR__ . '/../resources/views/' => resource_path('views/vendor/invoices'),
             __DIR__ . '/../config/invoices.php' => config_path('invoices.php'),
-        ], 'invoices');
+        ], [
+            'invoices.views',
+            'invoices.config'
+        ]);
     }
 }
