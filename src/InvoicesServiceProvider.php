@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Invoices;
 
-use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class InvoicesServiceProvider extends ServiceProvider implements DeferrableProvider
+class InvoicesServiceProvider extends ServiceProvider
 {
     /**
      * Perform post-registration booting of services.
