@@ -40,9 +40,19 @@ class InvoicesServiceProvider extends ServiceProvider implements DeferrableProvi
         );
 
         // Register the service the package provides.
-        $this->app->singleton('invoice', function ($app) {
+        $this->app->singleton('invoices', function ($app) {
             return new Invoices($app);
         });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides(): array
+    {
+        return ['invoices'];
     }
 
     /**
@@ -56,15 +66,5 @@ class InvoicesServiceProvider extends ServiceProvider implements DeferrableProvi
             __DIR__ . '/../resources/views/' => resource_path('views/vendor/invoices'),
             __DIR__ . '/../config/invoices.php' => config_path('invoices.php'),
         ], 'invoices');
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides(): array
-    {
-        return ['invoices'];
     }
 }
