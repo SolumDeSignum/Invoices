@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace SolumDeSignum\Invoices;
 
+use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Support\ServiceProvider;
 
-class InvoicesServiceProvider extends ServiceProvider
+class InvoicesServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Perform post-registration booting of services.
@@ -39,12 +40,19 @@ class InvoicesServiceProvider extends ServiceProvider
         );
 
         // Register the service the package provides.
-        $this->app->singleton(
-            'package-translator-loader',
-            function ($app) {
-                return new Invoices($app);
-            }
-        );
+        $this->app->singleton('invoices', function ($app) {
+            return new Invoices($app);
+        });
+    }
+
+    /**
+     * Get the services provided by the provider.
+     *
+     * @return array
+     */
+    public function provides(): array
+    {
+        return ['invoices'];
     }
 
     /**
@@ -58,15 +66,5 @@ class InvoicesServiceProvider extends ServiceProvider
             __DIR__ . '/../resources/views/' => resource_path('views/vendor/invoices'),
             __DIR__ . '/../config/invoices.php' => config_path('invoices.php'),
         ], 'invoices');
-    }
-
-    /**
-     * Get the services provided by the provider.
-     *
-     * @return array
-     */
-    public function provides(): array
-    {
-        return ['invoices'];
     }
 }
